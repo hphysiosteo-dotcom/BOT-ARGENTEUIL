@@ -448,52 +448,69 @@ def get_daily_data():
 
 
 def build_kine_summary(kine_name, entries, urgences_communes):
-    """Construit le resume pour UN kine."""
+    """Construit le resume pour UN kine — format friendly et clair."""
     all_entries = entries + urgences_communes
     if not all_entries:
         return None  # Rien a envoyer
-    
+
     date = datetime.now().strftime("%d/%m/%Y")
     prenom = kine_name.split()[0]
-    
-    lines = [f"📋 Résumé du {date}"]
-    lines.append(f"Bonjour {prenom} ! Voici ton récap :\n")
-    
-    # Compteurs
+
+    # Header sympa
+    lines = []
+    lines.append(f"🏥 *Cabinet Kiné Val d'Argenteuil*")
+    lines.append(f"📋 *Récap du {date}*")
+    lines.append(f"")
+    lines.append(f"Salut {prenom} ! Voici ce qui s'est passé aujourd'hui pour toi 👇")
+    lines.append("")
+
+    # Compteurs visuels
     nb_rdv = sum(1 for e in all_entries if e["type"] == "rdv")
     nb_annul = sum(1 for e in all_entries if e["type"] == "annulation")
     nb_urg = sum(1 for e in all_entries if e["type"] == "urgence")
-    
-    counts = []
-    if nb_rdv: counts.append(f"📅 {nb_rdv} RDV")
-    if nb_annul: counts.append(f"📋 {nb_annul} annulation{'s' if nb_annul > 1 else ''}")
-    if nb_urg: counts.append(f"🚨 {nb_urg} urgence{'s' if nb_urg > 1 else ''}")
-    lines.append(" | ".join(counts) + "\n")
-    
-    # Tableau
-    lines.append("━━━━━━━━━━━━━━━━━━━━━━")
-    
-    type_labels = {"rdv": "📅 RDV", "annulation": "📋 Annul.", "urgence": "🚨 URGENCE"}
-    
-    for e in entries:
-        label = type_labels.get(e["type"], "💬")
-        lines.append(f"{e['canal']} {label}")
-        lines.append(f"   👤 {e['patient']}")
-        lines.append(f"   📞 {e['phone']}")
-        lines.append(f"   💬 \"{e['resume']}\"")
-        lines.append("──────────────────────")
-    
+    nb_total = len(all_entries)
+
+    lines.append(f"📊 *{nb_total} interaction{'s' if nb_total > 1 else ''}*")
+    stats = []
+    if nb_rdv: stats.append(f"📅 {nb_rdv} demande{'s' if nb_rdv > 1 else ''} de RDV")
+    if nb_annul: stats.append(f"🔄 {nb_annul} annulation{'s' if nb_annul > 1 else ''}")
+    if nb_urg: stats.append(f"🚨 {nb_urg} urgence{'s' if nb_urg > 1 else ''}")
+    if stats:
+        lines.append("  " + "  •  ".join(stats))
+    lines.append("")
+
+    # Tableau des interactions
+    type_icons = {"rdv": "📅", "annulation": "🔄", "urgence": "🚨"}
+    type_labels = {"rdv": "Demande RDV", "annulation": "Annulation", "urgence": "URGENCE"}
+    canal_labels = {"📞": "Appel", "📱": "WhatsApp", "💬": "SMS"}
+
+    for i, e in enumerate(entries, 1):
+        icon = type_icons.get(e["type"], "💬")
+        label = type_labels.get(e["type"], "Message")
+        canal = canal_labels.get(e["canal"], e["canal"])
+
+        lines.append(f"┌─ {icon} *{label}* ({canal})")
+        lines.append(f"│  👤 {e['patient']}")
+        lines.append(f"│  📞 {e['phone']}")
+        lines.append(f"│  💬 _{e['resume']}_")
+        lines.append(f"└{'─' * 25}")
+        if i < len(entries):
+            lines.append("")
+
     # Urgences communes (sans kine attribue)
     if urgences_communes:
         lines.append("")
-        lines.append("🚨 URGENCES NON ATTRIBUÉES :")
+        lines.append("⚠️ *Urgences non attribuées :*")
         for e in urgences_communes:
-            lines.append(f"   👤 {e['patient']} — 📞 {e['phone']}")
-            lines.append(f"   💬 \"{e['resume']}\"")
-            lines.append("──────────────────────")
-    
-    lines.append(f"\nBonne soirée {prenom} 😊")
-    
+            lines.append(f"┌─ 🚨 *URGENCE*")
+            lines.append(f"│  👤 {e['patient']}  •  📞 {e['phone']}")
+            lines.append(f"│  💬 _{e['resume']}_")
+            lines.append(f"└{'─' * 25}")
+
+    # Footer friendly
+    lines.append("")
+    lines.append(f"Bonne soirée {prenom}, repose-toi bien ! 😊💪")
+
     return "\n".join(lines)
 
 
