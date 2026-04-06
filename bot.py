@@ -20,16 +20,19 @@ TWILIO_WHATSAPP_NUMBER = os.environ.get("TWILIO_WHATSAPP_NUMBER")
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 ALERT_NUMBER = os.environ.get("ALERT_NUMBER", "whatsapp:+33XXXXXXXXX")
 
-# WhatsApp de chaque kine (a remplir avec les vrais numeros)
+# WhatsApp de chaque kine
 KINE_WHATSAPP = {
-    "Kaouthar Beddiaf": os.environ.get("WA_KAOUTHAR", "whatsapp:+33XXXXXXXXX"),
-    "Yann Chatenay": os.environ.get("WA_YANN", "whatsapp:+33XXXXXXXXX"),
-    "Lucas Gousseff": os.environ.get("WA_LUCAS", "whatsapp:+33XXXXXXXXX"),
-    "Samy Hajji": os.environ.get("WA_SAMY", "whatsapp:+33XXXXXXXXX"),
-    "Ahmed Jaballah": os.environ.get("WA_AHMED", "whatsapp:+33XXXXXXXXX"),
-    "Mehdi Moulay Ben Mohand": os.environ.get("WA_MEHDI", "whatsapp:+33XXXXXXXXX"),
+    "Kaouthar Beddiaf": os.environ.get("WA_KAOUTHAR", "whatsapp:+33666679070"),
+    "Yann Chatenay": os.environ.get("WA_YANN", "whatsapp:+33633735234"),
+    "Lucas Gousseff": os.environ.get("WA_LUCAS", "whatsapp:+33659014769"),
+    "Samy Hajji": os.environ.get("WA_SAMY", "whatsapp:+33670095899"),
+    "Ahmed Jaballah": os.environ.get("WA_AHMED", "whatsapp:+33651693344"),
+    "Mehdi Moulay Ben Mohand": os.environ.get("WA_MEHDI", "whatsapp:+32471901673"),
     "Mohammed-Houcine Saidi-Remili": os.environ.get("WA_HOUCINE", "whatsapp:+33XXXXXXXXX"),
 }
+
+# Amine recoit le meme resume que Houcine (shadow, pas visible dans les messages)
+WA_AMINE_SHADOW = os.environ.get("WA_AMINE", "whatsapp:+33785987772")
 
 twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 claude_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
@@ -494,6 +497,16 @@ def build_kine_summary(kine_name, entries, urgences_communes):
     return "\n".join(lines)
 
 
+def _send_wa_message(wa_number, message):
+    """Envoie un message WhatsApp (decoupe si > 1500 chars)."""
+    if len(message) > 1500:
+        parts = [message[i:i+1500] for i in range(0, len(message), 1500)]
+        for part in parts:
+            twilio_client.messages.create(body=part, from_=TWILIO_WHATSAPP_NUMBER, to=wa_number)
+    else:
+        twilio_client.messages.create(body=message, from_=TWILIO_WHATSAPP_NUMBER, to=wa_number)
+
+
 def send_kine_summary(kine_name, message):
     """Envoie le resume a un kine par WhatsApp."""
     wa_number = KINE_WHATSAPP.get(kine_name)
@@ -501,13 +514,15 @@ def send_kine_summary(kine_name, message):
         print(f"[RESUME] Pas de numero pour {kine_name}, skip")
         return False
     try:
-        if len(message) > 1500:
-            parts = [message[i:i+1500] for i in range(0, len(message), 1500)]
-            for part in parts:
-                twilio_client.messages.create(body=part, from_=TWILIO_WHATSAPP_NUMBER, to=wa_number)
-        else:
-            twilio_client.messages.create(body=message, from_=TWILIO_WHATSAPP_NUMBER, to=wa_number)
+        _send_wa_message(wa_number, message)
         print(f"[RESUME] Envoye a {kine_name}")
+        # Si c'est Houcine, envoyer aussi a Amine (meme contenu, shadow)
+        if kine_name == "Mohammed-Houcine Saidi-Remili":
+            try:
+                _send_wa_message(WA_AMINE_SHADOW, message)
+                print(f"[RESUME] Shadow envoye a Amine")
+            except Exception as e2:
+                print(f"[RESUME] Erreur shadow Amine: {e2}")
         return True
     except Exception as e:
         print(f"[RESUME] Erreur pour {kine_name}: {e}")
