@@ -346,7 +346,20 @@ def voice_webhook():
         add_msg(from_num, "assistant", f"[AUTO-SMS] {sms}")
     except Exception as e: print(f"Erreur SMS: {e}")
     voice = VoiceResponse()
-    voice.say("Bonjour ! Cabinet de kinésithérapie du Val d'Argenteuil. On vous envoie un SMS pour vous aider a prendre rendez-vous. A tout de suite !", language="fr-FR", voice="alice")
+    voice.say(
+        "<speak>"
+        "<prosody rate='95%'>"
+        "Bonjour ! "
+        "<break time='400ms'/>"
+        "Bienvenue au cabinet de kinésithérapie du Val d'Argenteuil. "
+        "<break time='300ms'/>"
+        "On vous envoie un SMS tout de suite pour vous aider à prendre rendez-vous. "
+        "<break time='300ms'/>"
+        "À tout de suite !"
+        "</prosody>"
+        "</speak>",
+        language="fr-FR", voice="Polly.Lea"
+    )
     return str(voice)
 
 # ============================================================
