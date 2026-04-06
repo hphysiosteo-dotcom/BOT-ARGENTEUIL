@@ -348,17 +348,17 @@ def voice_webhook():
     voice = VoiceResponse()
     voice.say(
         "<speak>"
-        "<prosody rate='95%'>"
-        "Bonjour ! "
+        "<prosody rate='92%' pitch='+2%'>"
+        "Bonjour !"
+        "<break time='500ms'/>"
+        "Bienvenue au cabinet de kinésithérapie, du Val d'Argenteuil."
         "<break time='400ms'/>"
-        "Bienvenue au cabinet de kinésithérapie du Val d'Argenteuil. "
-        "<break time='300ms'/>"
-        "On vous envoie un SMS tout de suite pour vous aider à prendre rendez-vous. "
-        "<break time='300ms'/>"
+        "On vous envoie un S M S, tout de suite, pour vous aider à prendre rendez-vous."
+        "<break time='400ms'/>"
         "À tout de suite !"
         "</prosody>"
         "</speak>",
-        language="fr-FR", voice="Polly.Lea"
+        language="fr-FR", voice="Google.fr-FR-Neural2-A"
     )
     return str(voice)
 
