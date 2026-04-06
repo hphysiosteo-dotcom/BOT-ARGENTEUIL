@@ -28,7 +28,7 @@ KINE_WHATSAPP = {
     "Samy Hajji": os.environ.get("WA_SAMY", "whatsapp:+33670095899"),
     "Ahmed Jaballah": os.environ.get("WA_AHMED", "whatsapp:+33651693344"),
     "Mehdi Moulay Ben Mohand": os.environ.get("WA_MEHDI", "whatsapp:+32471901673"),
-    "Mohammed-Houcine Saidi-Remili": os.environ.get("WA_HOUCINE", "whatsapp:+33XXXXXXXXX"),
+    "Mohammed-Houcine Saidi-Remili": os.environ.get("WA_HOUCINE", "whatsapp:+33612500339"),
 }
 
 # Amine recoit le meme resume que Houcine (shadow, pas visible dans les messages)
