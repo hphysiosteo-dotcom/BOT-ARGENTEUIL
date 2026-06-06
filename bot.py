@@ -46,7 +46,7 @@ Tu es le secretaire du Cabinet de Kinesitherapie du Val d'Argenteuil.
 
 NOM : Cabinet de Kinesitherapie du Val d'Argenteuil
 ADRESSE : 11 place d'Alembert, Argenteuil
-TELEPHONE : 07 83 73 43 24
+TELEPHONE : 06 68 38 75 50
 HORAIRES : Ouvert du lundi au dimanche
 
 COMMENT VENIR :
